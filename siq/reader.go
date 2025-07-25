@@ -384,6 +384,11 @@ func (p *Package) GetQuestionsByType(questionType string) []Question {
 	return questions
 }
 
+// ConvertV4ToV5Question converts a v4 question to v5 format (exported version)
+func ConvertV4ToV5Question(qv4 QuestionV4) Question {
+	return convertV4ToV5Question(qv4)
+}
+
 // convertV4ToV5Question converts a v4 question to v5 format
 func convertV4ToV5Question(qv4 QuestionV4) Question {
 	question := Question{
