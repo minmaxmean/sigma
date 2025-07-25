@@ -6,16 +6,30 @@ import (
 	"os"
 
 	"github.com/minmaxmean/sigma/siq"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: sigma <siq-file>")
-		fmt.Println("Example: sigma game.siq")
-		os.Exit(1)
-	}
+var rootCmd = &cobra.Command{
+	Use:   "sigma",
+	Short: "A CLI tool for processing SIQ files",
+	Long: `Sigma is a command-line tool for reading and analyzing SIQ (SIG Pack) files.
+It provides detailed information about SIG packages including questions, answers, and metadata.`,
+}
 
-	siqFile := os.Args[1]
+var readCmd = &cobra.Command{
+	Use:   "read [siq-file]",
+	Short: "Read and display information from a SIQ file",
+	Long: `Read a SIQ file and display comprehensive information including:
+- Package metadata (name, ID, version, difficulty, etc.)
+- Statistics (rounds, themes, questions)
+- File listing
+- Question details with answers`,
+	Args: cobra.ExactArgs(1),
+	Run:  runRead,
+}
+
+func runRead(cmd *cobra.Command, args []string) {
+	siqFile := args[0]
 
 	// Open and read the SIQ file
 	reader, err := siq.NewSIQReader(siqFile)
@@ -91,4 +105,15 @@ func main() {
 	}
 
 	fmt.Println("SIQ file processed successfully!")
+}
+
+func init() {
+	rootCmd.AddCommand(readCmd)
+}
+
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
