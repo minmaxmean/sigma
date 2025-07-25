@@ -1,0 +1,23 @@
+# Cursor Rules for Sigma Project
+
+## Go Development Rules
+
+### Use `go run` instead of building binaries
+- Always use `go run sigma.go` or `go run .` instead of `go build` followed by running the binary
+- This avoids creating build artifacts and keeps the development workflow cleaner
+- Example: Use `go run sigma.go game.siq` instead of `go build && ./sigma game.siq`
+
+### Code Style
+- Follow Go conventions and formatting
+- Use `gofmt` for code formatting
+- Prefer explicit error handling over ignoring errors
+
+### Project Structure
+- Keep the main application logic in `sigma.go`
+- Use the `siq` package for SIQ file handling
+- Store documentation in the `docs/` directory
+- Use `data/` for any data files
+
+### Testing
+- Use `go test ./...` to run all tests
+- Write tests for new functionality in the `siq` package 
