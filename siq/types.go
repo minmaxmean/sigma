@@ -18,11 +18,13 @@ const (
 
 // ContentType represents content item types
 const (
-	ContentTypeText  = "text"
-	ContentTypeImage = "image"
-	ContentTypeAudio = "audio"
-	ContentTypeVideo = "video"
-	ContentTypeHtml  = "html"
+	ContentTypeText   = "text"
+	ContentTypeImage  = "image"
+	ContentTypeAudio  = "audio"
+	ContentTypeVideo  = "video"
+	ContentTypeVoice  = "voice"
+	ContentTypeMarker = "marker"
+	ContentTypeHtml   = "html"
 )
 
 // PlacementType represents content placement types

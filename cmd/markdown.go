@@ -6,8 +6,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kr/pretty"
 	"github.com/minmaxmean/sigma/siq"
 	"github.com/spf13/cobra"
+)
+
+var (
+	skipMedia bool
 )
 
 var markdownCmd = &cobra.Command{
@@ -20,6 +25,10 @@ var markdownCmd = &cobra.Command{
 - Authors, sources, and comments`,
 	Args: cobra.ExactArgs(2),
 	Run:  runMarkdown,
+}
+
+func init() {
+	markdownCmd.Flags().BoolVarP(&skipMedia, "skip-media", "s", false, "Skip questions with media content (image, audio, video)")
 }
 
 func runMarkdown(cmd *cobra.Command, args []string) {
@@ -51,6 +60,21 @@ func runMarkdown(cmd *cobra.Command, args []string) {
 	fmt.Printf("Successfully converted %s to %s\n", siqFile, outputFile)
 }
 
+// hasMediaContent checks if a question contains media content (image, audio, video)
+func hasMediaContent(question *siq.Question) bool {
+	content := question.GetQuestionContent()
+	for _, item := range content {
+		switch item.Type {
+		case siq.ContentTypeImage, siq.ContentTypeAudio, siq.ContentTypeVideo, siq.ContentTypeVoice:
+			return true
+		case "", siq.ContentTypeMarker:
+		default:
+			pretty.Printf("question: %+v\n", item)
+		}
+	}
+	return false
+}
+
 func generateMarkdown(pkg *siq.Package, version int) string {
 	var sb strings.Builder
 
@@ -65,52 +89,71 @@ func generateMarkdown(pkg *siq.Package, version int) string {
 	}
 
 	for roundIndex, round := range rounds {
-		sb.WriteString(fmt.Sprintf("## Round %d: %s\n\n", roundIndex+1, round.Name))
+		fmt.Fprintf(&sb, "## Round %d: %s\n\n", roundIndex+1, round.Name)
 
 		// Process themes
 		for themeIndex, theme := range round.Themes {
-			sb.WriteString(fmt.Sprintf("### Theme %d: %s\n\n", themeIndex+1, theme.Name))
+			// Filter questions if skip-media flag is set
+			var filteredQuestions []siq.Question
+			if skipMedia {
+				for _, question := range theme.Questions {
+					if !hasMediaContent(&question) {
+						filteredQuestions = append(filteredQuestions, question)
+					}
+				}
+			} else {
+				filteredQuestions = theme.Questions
+			}
 
-			// Process questions
-			for questionIndex, question := range theme.Questions {
-				sb.WriteString(fmt.Sprintf("#### Question %d\n\n", questionIndex+1))
+			// Skip themes with no questions after filtering
+			if len(filteredQuestions) == 0 {
+				continue
+			}
+
+			fmt.Fprintf(&sb, "### Theme %d: %s\n\n", themeIndex+1, theme.Name)
+
+			// Process questions with original numbering
+			questionNumber := 1
+			for _, question := range filteredQuestions {
+				fmt.Fprintf(&sb, "#### Question %d\n\n", questionNumber)
 
 				// Question content
 				content := question.GetQuestionContent()
 				if len(content) > 0 {
-					sb.WriteString("**Content**:\n\n")
+					fmt.Fprintf(&sb, "**Content**:\n\n")
 					for _, item := range content {
-						sb.WriteString(fmt.Sprintf("- **%s**: %s", item.Type, item.Value))
+						fmt.Fprintf(&sb, "- %s", item.Value)
 						if item.Duration > 0 {
-							sb.WriteString(fmt.Sprintf(" (duration: %d)", item.Duration))
+							fmt.Fprintf(&sb, " (duration: %d)", item.Duration)
 						}
 						if item.Placement != "" && item.Placement != "screen" {
-							sb.WriteString(fmt.Sprintf(" (placement: %s)", item.Placement))
+							fmt.Fprintf(&sb, " (placement: %s)", item.Placement)
 						}
-						sb.WriteString("\n")
+						fmt.Fprintf(&sb, "\n")
 					}
-					sb.WriteString("\n")
+					fmt.Fprintf(&sb, "\n")
 				}
 
 				// Right answers
 				if len(question.Right) > 0 {
-					sb.WriteString("**Right Answer")
+					fmt.Fprintf(&sb, "**Right Answer")
 					if len(question.Right) > 1 {
-						sb.WriteString("s")
+						fmt.Fprintf(&sb, "s")
 					}
-					sb.WriteString("**:\n\n")
+					fmt.Fprintf(&sb, "**:\n\n")
 
 					if len(question.Right) == 1 {
-						sb.WriteString(question.Right[0] + "\n\n")
+						fmt.Fprintf(&sb, "%s\n\n", question.Right[0])
 					} else {
 						for i, answer := range question.Right {
-							sb.WriteString(fmt.Sprintf("%d. %s\n", i+1, answer))
+							fmt.Fprintf(&sb, "%d. %s\n", i+1, answer)
 						}
-						sb.WriteString("\n")
+						fmt.Fprintf(&sb, "\n")
 					}
 				}
 
-				sb.WriteString("---\n\n")
+				fmt.Fprintf(&sb, "---\n\n")
+				questionNumber++
 			}
 		}
 	}

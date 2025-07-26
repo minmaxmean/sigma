@@ -1,3 +1,6 @@
+---
+alwaysApply: false
+---
 # Go Development Guidelines
 
 ## Build and Run
