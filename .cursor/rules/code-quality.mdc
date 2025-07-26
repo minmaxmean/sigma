@@ -1,0 +1,33 @@
+---
+description: Code quality and formatting standards
+globs: ["*.go", "*.md", "*.json", "*.yml", "*.yaml"]
+alwaysApply: true
+---
+
+# Code Quality Standards
+
+## Formatting
+- Use 2-space indentation (configured in `.editorconfig`)
+- Follow Go naming conventions for Go files
+- Use meaningful variable and function names
+- Add comments for complex logic
+- Use `gofmt` for Go code formatting
+
+## Error Handling
+- Always check and handle errors explicitly
+- Use appropriate error messages
+- Log errors when appropriate
+- Return meaningful error messages to users
+- Prefer explicit error handling over ignoring errors
+
+## Documentation
+- Add comments for complex logic
+- Use meaningful variable and function names
+- Document public APIs and functions
+- Keep documentation up to date
+
+## Best Practices
+- Write clean, readable code
+- Follow established patterns in the codebase
+- Use consistent naming conventions
+- Keep functions focused and single-purpose

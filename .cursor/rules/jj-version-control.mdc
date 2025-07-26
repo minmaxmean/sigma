@@ -1,0 +1,24 @@
+---
+description: JJ version control system guidelines and commands
+globs: []
+alwaysApply: false
+---
+
+# Version Control (JJ)
+
+## JJ Documentation
+- Official documentation: https://jj-vcs.github.io/jj/latest/
+- JJ is a Git-compatible version control system with different command syntax
+
+## JJ Commands
+- Use `jj git push` to push changes to remote (not `jj push`)
+- Common commands: `jj status`, `jj log`, `jj new`, `jj edit`, `jj git push`
+- Use `jj status` to check current state
+- Use `jj log` to view commit history
+
+## Workflow
+- Check status before making changes: `jj status`
+- Create new changes: `jj new`
+- Edit existing changes: `jj edit`
+- View history: `jj log`
+- Push to remote: `jj git push`
